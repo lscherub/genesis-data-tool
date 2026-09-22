@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Genesis POS Cleaner</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <main class="app-shell">
+    <section class="app-card">
+      <header class="hero">
+        <div class="brand-mark">G</div>
+        <div>
+          <p class="eyebrow">GENESIS DATA TOOLS</p>
+          <h1>POS Excel Cleaner</h1>
+          <p class="subtitle">Upload your Amber/Cybex POS export and download a clean, organized Excel file.</p>
+        </div>
+      </header>
+
+      <section id="dropZone" class="drop-zone" tabindex="0">
+        <input id="fileInput" type="file" accept=".xlsx,.xls,.csv" hidden />
+        <div class="upload-icon">↑</div>
+        <h2>Drop your Excel file here</h2>
+        <p>or</p>
+        <button id="chooseBtn" class="primary-btn" type="button">Choose Excel File</button>
+        <small>Supports .xlsx, .xls and .csv</small>
+      </section>
+
+      <section id="statusCard" class="status-card hidden">
+        <div class="status-top">
+          <div>
+            <span class="status-label">FILE</span>
+            <strong id="fileName">—</strong>
+          </div>
+          <span id="statusBadge" class="badge">Waiting</span>
+        </div>
+        <div id="statusMessage" class="status-message">Ready.</div>
+        <div id="checks" class="checks"></div>
+      </section>
+
+      <section id="previewSection" class="preview-section hidden">
+        <div class="section-heading">
+          <div>
+            <span class="status-label">OUTPUT PREVIEW</span>
+            <h2>Cleaned data</h2>
+          </div>
+          <span id="rowCount" class="row-count">0 products</span>
+        </div>
+
+        <div class="table-wrap">
+          <table id="previewTable">
+            <thead></thead>
+            <tbody></tbody>
+          </table>
+        </div>
+      </section>
+
+      <section class="output-section">
+        <div class="section-heading">
+          <div>
+            <span class="status-label">OUTPUT COLUMNS</span>
+            <h2>8 columns</h2>
+          </div>
+        </div>
+        <div class="column-list">
+          <span>Sku</span>
+          <span>Product Number</span>
+          <span>Description</span>
+          <span>Vendor</span>
+          <span>Brand</span>
+          <span>List Cost</span>
+          <span>Price</span>
+          <span>Size Desc</span>
+        </div>
+      </section>
+
+      <div class="actions">
+        <button id="downloadBtn" class="download-btn" type="button" disabled>
+          Clean &amp; Download Excel
+        </button>
+        <button id="resetBtn" class="reset-btn" type="button">Reset</button>
+      </div>
+
+      <footer>
+        <span>Processed locally in your browser.</span>
+        <span>Your POS file is not uploaded to a server.</span>
+      </footer>
+    </section>
+  </main>
+
+  <script src="https://cdn.sheetjs.com/xlsx-0.20.3/package/dist/xlsx.full.min.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>
