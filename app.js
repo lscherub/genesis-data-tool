@@ -220,17 +220,25 @@ function formatPreview(value) {
 function downloadExcel() {
   if (!cleanedRows.length) return;
 
-  const rows = cleanedRows.map(row => {
-    const obj = {};
-    OUTPUT_COLUMNS.forEach(col => obj[col] = row[col]);
-    return obj;
-  });
+  // Build a minimal worksheet: only the 8 required columns and values.
+  // We intentionally avoid per-cell styling/formatting because it can
+  // substantially increase the size of large XLSX files.
+  const matrix = [
+    OUTPUT_COLUMNS,
+    ...cleanedRows.map(row =>
+      OUTPUT_COLUMNS.map(col => {
+        const value = row[col];
+        if (value instanceof Date && !isNaN(value)) {
+          return value.toISOString().slice(0, 10);
+        }
+        return value ?? "";
+      })
+    )
+  ];
 
-  const worksheet = XLSX.utils.json_to_sheet(rows, {
-    header: OUTPUT_COLUMNS,
-    cellDates: true
-  });
+  const worksheet = XLSX.utils.aoa_to_sheet(matrix);
 
+  // Only set practical column widths. No cell-level styles are added.
   worksheet["!cols"] = [
     { wch: 16 },
     { wch: 18 },
@@ -242,36 +250,6 @@ function downloadExcel() {
     { wch: 14 }
   ];
 
-  const range = XLSX.utils.decode_range(worksheet["!ref"]);
-  for (let c = 0; c < OUTPUT_COLUMNS.length; c++) {
-    const cell = worksheet[XLSX.utils.encode_cell({ r: 0, c })];
-    if (cell) cell.s = { font: { bold: true } };
-  }
-
-  // Keep SKU/Product Number as text where possible.
-  for (let r = 1; r <= range.e.r; r++) {
-    for (const c of [0, 1]) {
-      const address = XLSX.utils.encode_cell({ r, c });
-      if (worksheet[address]) {
-        worksheet[address].t = "s";
-        worksheet[address].v = String(worksheet[address].v ?? "");
-      }
-    }
-  }
-
-  // Format List Cost and Price as two-decimal numbers when they are numeric.
-  for (const c of [5, 6]) {
-    for (let r = 1; r <= range.e.r; r++) {
-      const address = XLSX.utils.encode_cell({ r, c });
-      const cell = worksheet[address];
-      if (cell && cell.v !== "" && !isNaN(Number(cell.v))) {
-        cell.t = "n";
-        cell.v = Number(cell.v);
-        cell.z = "0.00";
-      }
-    }
-  }
-
   const workbook = XLSX.utils.book_new();
   XLSX.utils.book_append_sheet(workbook, worksheet, "Cleaned POS");
 
@@ -281,7 +259,9 @@ function downloadExcel() {
     .replace(/[^a-z0-9_-]+/gi, "_")
     .replace(/^_+|_+$/g, "");
 
-  XLSX.writeFile(workbook, `${base || "Genesis_POS"}_Cleaned_${date}.xlsx`);
+  XLSX.writeFile(workbook, `${base || "Genesis_POS"}_Cleaned_${date}.xlsx`, {
+    compression: true
+  });
 }
 
 function setStatus(message, badgeText) {

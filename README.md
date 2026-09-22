@@ -18,7 +18,7 @@ A one-page browser app for cleaning Genesis Amber/Cybex POS Excel exports.
   8. Size Desc
 - Removes all other columns
 - Shows a preview before downloading
-- Creates a new `.xlsx` file
+- Creates a compact new `.xlsx` file with only the required data and minimal formatting
 - Processes files locally in the browser
 
 ## GitHub Pages
